@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, flash, redirect
 from app import app
 from app.forms import LoginForm
 
@@ -20,7 +20,11 @@ def index():
 
 	return render_template('index.html', title='Home', user=user, posts=posts)
 
-@app.route('/login')
+#GET requests information to the client, POST requests used to submit forms
+@app.route('/login', methods=['GET', 'POST']) # Accepts both GET and POST request
 def login():
 	form = LoginForm()
+	if form.validate_on_submit(): # Does all the form processing work
+		flash('Login requested for user {}, remember_me={}'.format(form.username.data, form.remember_me.data)) # flash() function is a useful way to show a message to the user. 
+		return redirect('/index') #Redirect the user to the index page of the application.
 	return render_template('login.html', title='Sign In', form=form)
