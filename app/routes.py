@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, url_for
 from app import app
 from app.forms import LoginForm
 
@@ -26,5 +26,5 @@ def login():
 	form = LoginForm()
 	if form.validate_on_submit(): # Does all the form processing work
 		flash('Login requested for user {}, remember_me={}'.format(form.username.data, form.remember_me.data)) # flash() function is a useful way to show a message to the user. 
-		return redirect('/index') #Redirect the user to the index page of the application.
+		return redirect(url_for('index')) #Redirect the user to the index page of the application.
 	return render_template('login.html', title='Sign In', form=form)
