@@ -19,8 +19,6 @@ class Post(db.Model):
     The new Post class will represent blog posts written by users. The timestamp field is defined with a datetime type hint and is configured to be indexed, which is useful if you want to efficiently retrieve posts in chronological order. 
 
     The user_id field was initialized as a foreign key to User.id, which means that it references values from the id column in the users table. Since not all databases automatically create an index for foreign keys, the index=True option is added explicitly, so that searches based on this column are optimized.
-
-
     """
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
