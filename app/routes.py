@@ -48,7 +48,7 @@ def login():
 		next_page = request.args.get('next')
 		if not next_page or urlsplit(next_page).netloc != '':
 			next_page = url_for('index')
-		return redirect(url_for(next_page)) #Redirect the user to the index page of the application.
+		return redirect(next_page) #Redirect the user to the index page of the application.
 	return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
