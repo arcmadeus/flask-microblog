@@ -7,7 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from hashlib import md5
 
-
+# Defining followers and followed users.
+followers = sa.Table(
+    'followers',
+    db.metadata,
+    sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+    sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True)
+)
 class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key = True)
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
@@ -31,7 +37,7 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     
-    # Many-to-many relationship
+    ## Many-to-many relationship
     """
     Both relationships are defined with the so.WriteOnlyMapped type
     > secondary configures the association table that is used for this relationship, which I defined right above this class.
@@ -45,9 +51,41 @@ class User(UserMixin, db.Model):
         back_populates='followers')
 
     followers: so.WriteOnlyMapped['User'] = so.relationship(
-        secondary=followers, primanryjoin=(followers.c.followed_id == id),
+        secondary=followers, primaryjoin=(followers.c.followed_id == id),
         secondaryjoin=(followers.c.follower_id == id),
         back_populates='following')    
+    
+    ## Adding and removing followers
+    """
+    The is_following() method performs a query on the following relationship to see if a given user is already included in it. All write-only relationships have a select() method that constructs a query that returns all the elements in the relationship. 
+
+    The followers_count() and following_count() methods return the follower and following counts for the user. The sa.select() clause for these queries specify the sa.func.count() function from SQLAlchemy, to indicate that I want to get the result of a function. 
+    
+    The select_from() clause is then added with the query that needs to be counted. Whenever a query is included as part of a larger query, SQLAlchemy requires the inner query to be converted to a sub-query by calling the subquery() method.
+    """
+    def follow(self, user):
+        if not self.is_following(user):
+            self.following.add(user)
+    
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.following.remove(user)
+
+    def is_following(self, user):
+        query = self.following.select().where(followers.c.followed_id == user.id)
+        return db.session.scalar(query) is not None
+    
+    def followers_count(self):
+        query = sa.select(sa.func.count()).select_from(
+            self.followers.select().subquery()
+        )
+        return db.session.scalar(query)
+    
+    def following_count(self):
+        query = sa.select(sa.func.count()).select_from(
+            self.following.select().subquery()
+        )
+        return db.session.scalar(query)
 class Post(db.Model):
     """
     The new Post class will represent blog posts written by users. The timestamp field is defined with a datetime type hint and is configured to be indexed, which is useful if you want to efficiently retrieve posts in chronological order. 
@@ -69,10 +107,3 @@ class Post(db.Model):
 def load_user(id):
     return db.session.get(User, int(id))
 
-# Defining followers and followed users.
-followers = sa.Table(
-    'followers',
-    db.metadata,
-    sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
-    sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True)
-)
