@@ -60,7 +60,7 @@ class User(UserMixin, db.Model):
     The is_following() method performs a query on the following relationship to see if a given user is already included in it. All write-only relationships have a select() method that constructs a query that returns all the elements in the relationship. 
 
     The followers_count() and following_count() methods return the follower and following counts for the user. The sa.select() clause for these queries specify the sa.func.count() function from SQLAlchemy, to indicate that I want to get the result of a function. 
-    
+
     The select_from() clause is then added with the query that needs to be counted. Whenever a query is included as part of a larger query, SQLAlchemy requires the inner query to be converted to a sub-query by calling the subquery() method.
     """
     def follow(self, user):
@@ -86,6 +86,25 @@ class User(UserMixin, db.Model):
             self.following.select().subquery()
         )
         return db.session.scalar(query)
+    
+    ## Following post query
+    """
+    The select() portion of the query defines the entity that needs to be obtained, which in this case is posts. What I'm doing next is joining the entries in the posts table with the Post.author relationship.
+
+    A join is a database operation that combines rows from two tables, according to a given criteria temporarily. When the join() clause is given a relationship as an argument, SQLAlchemy combines the rows from the left and right sides of the relationship.
+
+
+    """
+    def following_posts(self):
+        Author = so.aliased(User)
+        Follower = so.aliased(User)
+        return (
+            sa.select(Post)
+            .join(Post.author.of_type(Author)) # Matches the posts of their respective users
+            .join(Author.followers.of_type(Follower))
+            .where(Follower.id == self.id)
+            .order_by(Post.timestamp.desc())
+        )
 class Post(db.Model):
     """
     The new Post class will represent blog posts written by users. The timestamp field is defined with a datetime type hint and is configured to be indexed, which is useful if you want to efficiently retrieve posts in chronological order. 
