@@ -93,17 +93,23 @@ class User(UserMixin, db.Model):
 
     A join is a database operation that combines rows from two tables, according to a given criteria temporarily. When the join() clause is given a relationship as an argument, SQLAlchemy combines the rows from the left and right sides of the relationship.
 
+    Effectively, what the join above does is create an extended table that provides access to posts, along with information about the author of each post.
 
+    To be able to clearly tell SQLAlchemy how to join all these tables, I need to have a way to refer to users independently as authors and as followers. The so.aliased() calls are used to create two references to the User model that I can use in the query.
     """
     def following_posts(self):
-        Author = so.aliased(User)
-        Follower = so.aliased(User)
+        Author = so.aliased(User) # To combine the posts with their authors
+        Follower = so.aliased(User) # To combine the posts with their followers
         return (
             sa.select(Post)
             .join(Post.author.of_type(Author)) # Matches the posts of their respective users
-            .join(Author.followers.of_type(Follower))
-            .where(Follower.id == self.id)
-            .order_by(Post.timestamp.desc())
+            .join(Author.followers.of_type(Follower), isouter=True) # The isouter=True option tells SQLAlchemy to use a left outer join instead, which preserves items from the left side that have no match on the right.
+            .where(sa.or_(
+                Follower.id == self.id, # or is a conditional statement
+                Author.id == self.id
+            )) # Filters unnecessary posts
+            .group_by(Post) # This clause looks at the results after filtering has been done, and eliminates any duplicates of the provided arguments. 
+            .order_by(Post.timestamp.desc()) # Sorting
         )
 class Post(db.Model):
     """
