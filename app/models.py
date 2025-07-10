@@ -31,6 +31,23 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     
+    # Many-to-many relationship
+    """
+    Both relationships are defined with the so.WriteOnlyMapped type
+    > secondary configures the association table that is used for this relationship, which I defined right above this class.
+    > primaryjoin indicates the condition that links the entity to the association table. In the following relationship, the user has to match the follower_id attribute of the association table, so the condition reflects that.
+    >  The followers.c.follower_id expression references the follower_id column of the association table. In the followers relationship, the roles are reversed, so the user must match the followed_id column.
+    > secondaryjoin indicates the condition that links the association table to the user on the other side of the relationship. In the following relationship, the user has to match the followed_id column, and in the followers relationship, the user has to match the follower_id column. 
+    """
+    following: so.WriteOnlyMapped['User'] = so.relationship(
+        secondary=followers, primaryjoin=(followers.c.follower_id == id),
+        secondaryjoin=(followers.c.followed_id == id),
+        back_populates='followers')
+
+    followers: so.WriteOnlyMapped['User'] = so.relationship(
+        secondary=followers, primanryjoin=(followers.c.followed_id == id),
+        secondaryjoin=(followers.c.follower_id == id),
+        back_populates='following')    
 class Post(db.Model):
     """
     The new Post class will represent blog posts written by users. The timestamp field is defined with a datetime type hint and is configured to be indexed, which is useful if you want to efficiently retrieve posts in chronological order. 
@@ -51,3 +68,11 @@ class Post(db.Model):
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
+
+# Defining followers and followed users.
+followers = sa.Table(
+    'followers',
+    db.metadata,
+    sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True),
+    sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'), primary_key=True)
+)
