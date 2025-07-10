@@ -7,6 +7,7 @@ from app import db
 from app.models import User
 from urllib.parse import urlsplit
 from datetime import datetime, timezone
+from app.forms import EmptyForm
 
 # Importing routes (It handles different URLs)
 @app.route('/') # Decorators are used as callbacks for certain events
@@ -81,6 +82,9 @@ def user(username):
 	]
 	return render_template('user.html', user=user, posts=posts)
 
+	form = EmptyForm()
+	return render_template('user.html', user=user, posts=posts, form=form)
+
 @app.before_request # Executes before the view function
 def before_request():
 	if current_user.is_authenticated:
@@ -101,3 +105,45 @@ def edit_profile():
 		form.username.data = current_user.username
 		form.about_me.data = current_user.about_me
 	return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+@app.route('/follow/<username>', methods=['POST'])
+@login_required
+def follow(username):
+	form = EmptyForm()
+	if form.validate_on_submit():
+		user = db.session.scalar(
+			sa.select(User).where(User.username == username))
+		if user is None:
+			flash(f'User {username} not found.')
+			return redirect(url_for('index'))
+		if user == current_user:
+			flash('You cannot follow yourself!')
+			return redirect(url_for('user', username=username))
+		current_user.follow(user)
+		db.session.commit()
+		flash(f'You are following {username}!')
+		return redirect(url_for('user', username=username))
+	else:
+		return redirect(url_for('index'))
+	
+@app.route('/unfollow/<username>', methods=['POST'])
+@login_required
+def unfollow(username):
+	form = EmptyForm()
+	if form.validate_on_submit():
+		user = db.session.scalar(
+			sa.select(User).where(User.username == username)
+		)
+		if user is None:
+			flash(f'User {username} not found.')
+			return redirect(url_for('index'))
+		if user == current_user:
+			flash('You cannot unfollow yourself!')
+			return redirect(url_for('user', username=username))
+		current_user.unfollow(user)
+		db.session.commit()
+		flash(f'You are not following {username}.')
+		return redirect(url_for('user', username=username))
+	else:
+		return redirect(url_for('index')) # The only reason why the validate_on_submit() call can fail is if the CSRF token is missing or invalid, so in that case I just redirect the application back to the home page.
+
