@@ -7,3 +7,42 @@
 2025-07-10 23:33:32,303 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
 2025-07-11 00:58:10,737 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
 2025-07-11 01:03:44,679 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
+2025-07-11 01:27:22,427 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
+2025-07-11 01:27:33,246 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
+2025-07-11 01:28:11,185 ERROR: Exception on /user/arc [GET] [in /home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/app.py:1414]
+Traceback (most recent call last):
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/arc/Downloads/For Programming/Python/microblog/app/routes.py", line 83, in user
+    return render_template('user.html', user=user, posts=posts)
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/templating.py", line 151, in render_template
+    return _render(app, template, context)
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/flask/templating.py", line 132, in _render
+    rv = template.render(context)
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/home/arc/Downloads/For Programming/Python/microblog/app/templates/user.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "/home/arc/Downloads/For Programming/Python/microblog/app/templates/base.html", line 34, in top-level template code
+    {% block content %}{% endblock %} <!-- Refer to index.html -->
+    ^^^^^^^^^^^^^^^^^
+  File "/home/arc/Downloads/For Programming/Python/microblog/app/templates/user.html", line 16, in block 'content'
+    {{ form.hidden_tag() }}
+    ^
+  File "/home/arc/Downloads/For Programming/Python/microblog/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'form' is undefined
+2025-07-11 01:34:45,730 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
