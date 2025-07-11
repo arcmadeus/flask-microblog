@@ -85,3 +85,4 @@ Traceback (most recent call last):
 jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'endif'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
 2025-07-11 14:16:36,779 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
 2025-07-11 14:18:42,217 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
+2025-07-11 14:38:06,983 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
