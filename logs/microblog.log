@@ -86,3 +86,5 @@ jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'endif'. Jinja wa
 2025-07-11 14:16:36,779 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
 2025-07-11 14:18:42,217 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
 2025-07-11 14:38:06,983 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
+2025-07-11 15:14:16,119 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
+2025-07-11 15:16:25,549 INFO: Microblog startup [in /home/arc/Downloads/For Programming/Python/microblog/app/__init__.py:49]
