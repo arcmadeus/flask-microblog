@@ -6,6 +6,9 @@ from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from hashlib import md5
+from time import time
+import jwt
+from app import app
 
 # Defining followers and followed users.
 followers = sa.Table(
@@ -111,6 +114,24 @@ class User(UserMixin, db.Model):
             .group_by(Post) # This clause looks at the results after filtering has been done, and eliminates any duplicates of the provided arguments. 
             .order_by(Post.timestamp.desc()) # Sorting
         )
+    
+    ## Resetting Password
+    """
+    The get_reset_password_token() function returns a JWT token as a string, which is generated directly by the jwt.encode() function.
+    The verify_reset_password_token() is a static method, which means that it can be invoked directly from the class.
+    """
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
+    
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return db.session.get(User, id)
 class Post(db.Model):
     """
     The new Post class will represent blog posts written by users. The timestamp field is defined with a datetime type hint and is configured to be indexed, which is useful if you want to efficiently retrieve posts in chronological order. 
