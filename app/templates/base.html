@@ -60,5 +60,7 @@
             {% block content %}{% endblock %} <!-- Refer to index.html -->
         </div>
         {{ moment.include_moment() }}
+        {{ moment.include_moment() }}
+        {{ moment.lang(g.locale) }} 
     </body>
 </html>

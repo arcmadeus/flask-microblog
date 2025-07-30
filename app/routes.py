@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, g
 from app import app
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm
 from flask_login import current_user, login_user, logout_user, login_required
@@ -9,6 +9,8 @@ from urllib.parse import urlsplit
 from datetime import datetime, timezone
 from app.forms import EmptyForm
 from app.email import send_password_reset_email
+from flask_babel import _, get_locale
+
 
 # Importing routes (It handles different URLs)
 @app.route('/', methods=['GET', 'POST']) # Decorators are used as callbacks for certain events
@@ -107,6 +109,7 @@ def before_request():
 	if current_user.is_authenticated:
 		current_user.last_seen = datetime.now(timezone.utc)
 		db.session.commit()
+	g.locale = str(get_locale())
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
