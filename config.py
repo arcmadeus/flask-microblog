@@ -15,3 +15,8 @@ class Config:
     ADMINS = ['timmarticio@gmail.com',]
 
     POSTS_PER_PAGE = 5
+
+    LANGUAGES = [
+        'en',
+        'es'
+    ]
