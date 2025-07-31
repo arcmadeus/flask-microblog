@@ -8,7 +8,7 @@ from flask_login import UserMixin
 from hashlib import md5
 from time import time
 import jwt
-from app import app
+from app import db, login
 
 # Defining followers and followed users.
 followers = sa.Table(
