@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from app.forms import EmptyForm
 from app.email import send_password_reset_email
 from flask_babel import _, get_locale
+from langdetect import detect, LangDetectException
 
 
 # Importing routes (It handles different URLs)
@@ -23,7 +24,11 @@ def index():
 	"""
 	form = PostForm()
 	if form.validate_on_submit():
-		post = Post(body=form.post.data, author=current_user)
+		try:
+			language = detect(form.post.data)
+		except LangDetectException:
+			language = ''
+		post = Post(body=form.post.data, author=current_user, language=language)
 		db.session.add(post)
 		db.session.commit()
 		flash(f'Your post is now live!')
